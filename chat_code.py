@@ -18,11 +18,11 @@ import plotly.graph_objects as go
 # 1. SBERT 모델 로딩
 model = SentenceTransformer('snunlp/KR-SBERT-V40K-klueNLI-augSTS')
 
-# 2. FAQ 데이터 로딩 (절대 경로 사용)
-FAQ_PATH = r'C:\Users\user\Desktop\please\chat_1.0\faq.json'
+# GitHub의 raw 파일 URL
+FAQ_URL = "https://raw.githubusercontent.com/kyj01051/chat_1.0/main/faq.json"
 
 def load_faq_data():
-    with open(FAQ_PATH, 'r', encoding='utf-8') as f:
+    with open(FAQ_URL, 'r', encoding='utf-8') as f:
         return json.load(f)
 
 faq_data = load_faq_data()
@@ -51,7 +51,7 @@ question_embeddings = model.encode(all_questions, convert_to_tensor=True)
 
 # FAQ 데이터 저장 함수
 def save_faq_data(data):
-    with open(FAQ_PATH, 'w', encoding='utf-8') as f:
+    with open(FAQ_URL, 'w', encoding='utf-8') as f:
         json.dump(data, f, ensure_ascii=False, indent=4)
     # 모델과 데이터 다시 로드
     global faq_data, all_questions, question_to_answer, question_to_related, question_embeddings
