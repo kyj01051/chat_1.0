@@ -5,7 +5,6 @@ import requests
 import time
 import os
 from datetime import datetime
-import mysql.connector
 import numpy as np
 import uuid
 import pandas as pd
@@ -21,6 +20,9 @@ model = SentenceTransformer('snunlp/KR-SBERT-V40K-klueNLI-augSTS')
 
 # GitHub의 raw 파일 URL
 FAQ_URL = "https://raw.githubusercontent.com/kyj01051/chat_1.0/main/faq.json"
+
+# 로그 파일 경로 설정
+LOGS_FILE = "chat_logs.json"
 
 def load_faq_data():
     # URL에서 파일을 다운로드
@@ -58,7 +60,7 @@ question_embeddings = model.encode(all_questions, convert_to_tensor=True)
 
 # FAQ 데이터 저장 함수
 def save_faq_data(data):
-    with open(FAQ_URL, 'w', encoding='utf-8') as f:
+    with open("faq_local.json", 'w', encoding='utf-8') as f:
         json.dump(data, f, ensure_ascii=False, indent=4)
     # 모델과 데이터 다시 로드
     global faq_data, all_questions, question_to_answer, question_to_related, question_embeddings
@@ -108,97 +110,75 @@ def find_best_answer_and_related(user_question, threshold=0.6, num_related=3):
             "score": best_score  # 유사도 점수 추가
         }
 
-# 6. MySQL 데이터베이스 연결 및 로그 저장 함수 (UUID 사용)
-def save_to_db(user_message, bot_response, similarity_score=None):
-    cursor = None
-    connection = None
+# 6. JSON 파일에 로그 저장 함수
+def save_to_logs(user_message, bot_response, similarity_score=None):
     try:
-        connection = mysql.connector.connect(
-            host=st.secrets["mysql"]["host"],
-            user=st.secrets["mysql"]["user"],
-            password=st.secrets["mysql"]["password"],
-            database=st.secrets["mysql"]["database"]
-        )
+        # 로그 파일이 존재하는지 확인
+        if os.path.exists(LOGS_FILE):
+            with open(LOGS_FILE, 'r', encoding='utf-8') as f:
+                logs = json.load(f)
+        else:
+            logs = []
+        
+        # 새 로그 항목 생성
+        log_entry = {
+            "id": str(uuid.uuid4()),
+            "timestamp": datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
+            "user_message": user_message,
+            "bot_response": bot_response,
+            "similarity_score": similarity_score
+        }
+        
+        # 로그 리스트에 추가
+        logs.append(log_entry)
+        
+        # 파일에 저장
+        with open(LOGS_FILE, 'w', encoding='utf-8') as f:
+            json.dump(logs, f, ensure_ascii=False, indent=4)
+            
+        return True
+    except Exception as e:
+        print(f"로그 저장 오류: {e}")
+        return False
 
-        cursor = connection.cursor()
-
-        # 유사도 점수 필드 추가
-        cursor.execute(''' 
-            CREATE TABLE IF NOT EXISTS chat_logs (
-                id VARCHAR(36) PRIMARY KEY,
-                timestamp DATETIME DEFAULT CURRENT_TIMESTAMP,
-                user_message TEXT,
-                bot_response TEXT,
-                similarity_score FLOAT NULL
-            )
-        ''')
-
-        unique_id = str(uuid.uuid4())
-        cursor.execute(''' 
-            INSERT INTO chat_logs (id, user_message, bot_response, similarity_score) 
-            VALUES (%s, %s, %s, %s)
-        ''', (unique_id, user_message, bot_response, similarity_score))
-
-        connection.commit()
-    except mysql.connector.Error as err:
-        print(f"Error: {err}")
-    finally:
-        if cursor:
-            cursor.close()
-        if connection:
-            connection.close()
-
-# 7. 데이터베이스에서 로그 불러오는 함수 추가
+# 7. JSON 파일에서 로그 불러오는 함수
 def load_logs(limit=None, search_query=None, date_range=None):
     try:
-        connection = mysql.connector.connect(
-            host=st.secrets["mysql"]["host"],
-            user=st.secrets["mysql"]["user"],
-            password=st.secrets["mysql"]["password"],
-            database=st.secrets["mysql"]["database"]
-        )
+        if not os.path.exists(LOGS_FILE):
+            return pd.DataFrame()
+            
+        with open(LOGS_FILE, 'r', encoding='utf-8') as f:
+            logs = json.load(f)
         
-        cursor = connection.cursor(dictionary=True)
+        if not logs:
+            return pd.DataFrame()
+            
+        # DataFrame으로 변환
+        df = pd.DataFrame(logs)
         
-        # 검색 조건 추가
-        where_clauses = []
-        params = []
+        # timestamp를 datetime 객체로 변환
+        df['timestamp'] = pd.to_datetime(df['timestamp'])
         
+        # 검색 조건 적용
         if search_query:
-            where_clauses.append("(user_message LIKE %s OR bot_response LIKE %s)")
-            search_pattern = f"%{search_query}%"
-            params.extend([search_pattern, search_pattern])
+            mask = (df['user_message'].str.contains(search_query, na=False)) | \
+                   (df['bot_response'].str.contains(search_query, na=False))
+            df = df[mask]
         
         if date_range:
             start_date, end_date = date_range
-            where_clauses.append("timestamp BETWEEN %s AND %s")
-            params.extend([start_date, end_date])
+            mask = (df['timestamp'] >= pd.Timestamp(start_date)) & \
+                   (df['timestamp'] <= pd.Timestamp(end_date))
+            df = df[mask]
         
-        where_clause = " WHERE " + " AND ".join(where_clauses) if where_clauses else ""
+        # 시간 역순 정렬
+        df = df.sort_values('timestamp', ascending=False)
         
-        limit_clause = f" LIMIT {limit}" if limit else ""
-        
-        query = f'''
-            SELECT id, timestamp, user_message, bot_response, similarity_score
-            FROM chat_logs
-            {where_clause}
-            ORDER BY timestamp DESC
-            {limit_clause}
-        '''
-        
-        cursor.execute(query, params)
-        
-        result = cursor.fetchall()
-        cursor.close()
-        connection.close()
-        
-        if result:
-            df = pd.DataFrame(result)
-            # timestamp를 datetime 객체로 변환
-            df['timestamp'] = pd.to_datetime(df['timestamp'])
-            return df
-        else:
-            return pd.DataFrame()
+        # 개수 제한 적용
+        if limit:
+            df = df.head(limit)
+            
+        return df
     except Exception as e:
         print(f"로그 불러오기 오류: {e}")
         return pd.DataFrame()
@@ -206,24 +186,24 @@ def load_logs(limit=None, search_query=None, date_range=None):
 # 로그 삭제 함수
 def delete_log(log_id):
     try:
-        connection = mysql.connector.connect(
-            host=st.secrets["mysql"]["host"],
-            user=st.secrets["mysql"]["user"],
-            password=st.secrets["mysql"]["password"],
-            database=st.secrets["mysql"]["database"]
-        )
+        if not os.path.exists(LOGS_FILE):
+            return False
+            
+        with open(LOGS_FILE, 'r', encoding='utf-8') as f:
+            logs = json.load(f)
         
-        cursor = connection.cursor()
-        query = "DELETE FROM chat_logs WHERE id = %s"
-        cursor.execute(query, (log_id,))
-        connection.commit()
+        # ID로 로그 항목 찾기
+        logs_filtered = [log for log in logs if log['id'] != log_id]
         
-        result = cursor.rowcount > 0
+        # 로그가 변경되었는지 확인
+        if len(logs) == len(logs_filtered):
+            return False
         
-        cursor.close()
-        connection.close()
-        
-        return result
+        # 변경된 로그 저장
+        with open(LOGS_FILE, 'w', encoding='utf-8') as f:
+            json.dump(logs_filtered, f, ensure_ascii=False, indent=4)
+            
+        return True
     except Exception as e:
         print(f"로그 삭제 오류: {e}")
         return False
@@ -250,8 +230,21 @@ def generate_wordcloud(text_data):
     if not text_data:
         return None
     
-    # 한글 폰트 설정 (시스템에 맞게 수정 필요)
-    font_path = "C:/Windows/Fonts/malgun.ttf"  # 윈도우 기준 맑은 고딕 폰트 경로
+    # 한글 폰트 설정
+    font_path = None  # 기본 폰트 사용
+    
+    try:
+        # Windows
+        if os.path.exists("C:/Windows/Fonts/malgun.ttf"):
+            font_path = "C:/Windows/Fonts/malgun.ttf"
+        # macOS
+        elif os.path.exists("/Library/Fonts/AppleGothic.ttf"):
+            font_path = "/Library/Fonts/AppleGothic.ttf"
+        # Linux
+        elif os.path.exists("/usr/share/fonts/truetype/nanum/NanumGothic.ttf"):
+            font_path = "/usr/share/fonts/truetype/nanum/NanumGothic.ttf"
+    except:
+        pass
     
     wordcloud = WordCloud(
         font_path=font_path,
@@ -282,8 +275,8 @@ if "process_new_question" not in st.session_state:
     st.session_state.process_new_question = False
 if "new_question" not in st.session_state:
     st.session_state.new_question = ""
-if "last_db_entry" not in st.session_state:
-    st.session_state.last_db_entry = {}
+if "last_log_entry" not in st.session_state:
+    st.session_state.last_log_entry = {}
 if 'admin_logged_in' not in st.session_state:
     st.session_state.admin_logged_in = False
 if 'show_login_form' not in st.session_state:
@@ -295,8 +288,7 @@ if 'edit_faq_index' not in st.session_state:
 if 'search_query' not in st.session_state:
     st.session_state.search_query = ""
 
-# 10. 관리자 로그인 사이드바 구현
-# 사이드바에서 로그인 버튼만 표시
+# 10. 사이드바 구현
 with st.sidebar:
 
     # 대화 초기화 버튼 - 로그인 여부와 상관없이 항상 표시
@@ -715,7 +707,7 @@ else:
             })
             
             # DB에 로그 저장 (유사도 점수 포함)
-            save_to_db(user_input, full_response, similarity_score)
+            save_to_logs(user_input, full_response, similarity_score)
             st.rerun()
 
         # 일반 사용자 입력 처리
@@ -749,9 +741,3 @@ else:
                 "content": full_response, 
                 "related_questions": related_questions
             })
-            
-            # DB에 로그 저장 (유사도 점수 포함)
-            save_to_db(user_input, full_response, similarity_score)
-            
-            # 페이지가 재로드되지 않을 경우를 대비해 여기서도 저장
-            save_to_db(user_input, response, result.get("score"))
