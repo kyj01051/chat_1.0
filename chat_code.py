@@ -15,6 +15,7 @@ from wordcloud import WordCloud
 import plotly.express as px
 import plotly.graph_objects as go
 
+
 # 1. SBERT 모델 로딩
 model = SentenceTransformer('snunlp/KR-SBERT-V40K-klueNLI-augSTS')
 
