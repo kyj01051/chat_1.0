@@ -93,6 +93,23 @@ def delete_log(log_id):
         return False
 
 # Streamlit 인터페이스
+st.title("Chatbot with Logs")
+
+# 사용자 입력 받기
+user_message = st.text_input("Your message:")
+
+if user_message:
+    # 예시 챗봇 응답 (여기서는 간단하게 사용자가 입력한 메시지를 반전시켜서 응답)
+    bot_response = f"Bot: {user_message[::-1]}"
+    
+    # 챗봇 응답 출력
+    st.write(bot_response)
+    
+    # 로그 저장
+    save_to_logs(user_message, bot_response)
+    st.success("Your question and bot response have been logged!")
+
+# 로그 관리 페이지
 st.title("로그 관리 페이지")
 
 # 로그를 불러와 DataFrame 형태로 출력
