@@ -227,6 +227,8 @@ def get_excel_download_link(df, filename="chat_logs.xlsx"):
     return href
 
 # 워드클라우드 생성 함수
+import streamlit as st
+
 def generate_wordcloud(text_data):
     if not text_data:
         return None
@@ -258,8 +260,9 @@ def generate_wordcloud(text_data):
     plt.figure(figsize=(10, 5))
     plt.imshow(wordcloud, interpolation='bilinear')
     plt.axis('off')
-    
-    return plt
+
+    # Streamlit에 표시
+    st.pyplot(plt)
 
 # 연관 질문 버튼 콜백 함수
 def ask_related_question(question):
