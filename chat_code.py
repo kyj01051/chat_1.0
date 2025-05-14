@@ -7,7 +7,6 @@ from datetime import datetime
 import mysql.connector
 import numpy as np
 import uuid
-import xlsxwriter
 import pandas as pd
 import matplotlib.pyplot as plt
 import io
@@ -280,46 +279,62 @@ if "last_db_entry" not in st.session_state:
     st.session_state.last_db_entry = {}
 if 'admin_logged_in' not in st.session_state:
     st.session_state.admin_logged_in = False
+if 'show_login_form' not in st.session_state:
+    st.session_state.show_login_form = False
 if 'admin_tab' not in st.session_state:
-    st.session_state.admin_tab = "대시보드"
+    st.session_state.admin_tab = "대시보드"  # 기본값 설정
 if 'edit_faq_index' not in st.session_state:
     st.session_state.edit_faq_index = -1
 if 'search_query' not in st.session_state:
     st.session_state.search_query = ""
 
 # 10. 관리자 로그인 사이드바 구현
+# 사이드바에서 로그인 버튼만 표시
 with st.sidebar:
-    st.markdown("## 🔒 관리자 로그인")
-    if not st.session_state.admin_logged_in:
+
+    # 대화 초기화 버튼 - 로그인 여부와 상관없이 항상 표시
+    st.markdown("## 💬 대화 관리")
+    if st.button("대화 초기화", key="clear_chat"):
+       st.session_state.messages = []
+       st.rerun()
+
+    # 로그인 버튼을 클릭하면 관리자 로그인 폼을 표시
+    if st.button("로그인"):
+        st.session_state.show_login_form = True
+
+
+# 로그인 폼 표시 여부 체크
+if st.session_state.show_login_form:
+    with st.sidebar:
+        st.markdown("### 로그인 폼")
         username = st.text_input("아이디", key="admin_username")
         password = st.text_input("비밀번호", type="password", key="admin_password")
+
         if st.button("로그인", key="admin_login"):
             # secrets.toml 파일에서 관리자 정보 불러오기
             if username == st.secrets["admin"]["username"] and password == st.secrets["admin"]["password"]:
                 st.session_state.admin_logged_in = True
                 st.success("로그인 성공!")
+                st.session_state.show_login_form = False  # 로그인 후 폼 숨기기
+                st.rerun()  # 페이지 새로 고침
             else:
                 st.error("아이디 또는 비밀번호가 틀렸습니다.")
-    else:
-        st.success("관리자 로그인됨 ✅")
-        
-        # 로그아웃 버튼을 더 눈에 띄게 스타일링
-        if st.button("로그아웃", key="admin_logout", type="primary"):
-            st.session_state.admin_logged_in = False
-            st.rerun()
-            
-        st.markdown("---")  # 구분선 추가
-            
-        # 관리자 탭 메뉴
-        st.markdown("## 📋 관리자 메뉴")
+
+
+# 로그인된 상태에서 관리자 기능 추가
+if st.session_state.admin_logged_in:
+    st.success("관리자 로그인됨 ✅")
+    
+    # 사이드바에 관리자 탭 메뉴와 로그아웃 버튼 추가
+    with st.sidebar:
         admin_tabs = ["대시보드", "FAQ 관리", "로그 관리", "챗봇 분석"]
         st.session_state.admin_tab = st.radio("메뉴 선택", admin_tabs)
-        
-    # 대화 초기화 버튼 - 로그인 여부와 상관없이 항상 표시
-    st.markdown("## 💬 대화 관리")
-    if st.button("대화 초기화", key="clear_chat"):
-        st.session_state.messages = []
-        st.rerun()
+
+        # 로그아웃 버튼
+        if st.button("로그아웃", key="admin_logout", type="primary"):
+            st.session_state.admin_logged_in = False
+            st.rerun()  # 페이지 새로 고침
+
 
 # 메인 영역 - 관리자 로그인 여부에 따른 UI 분기
 if st.session_state.admin_logged_in:
