@@ -7,6 +7,7 @@ from datetime import datetime
 import mysql.connector
 import numpy as np
 import uuid
+import xlsxwriter
 import pandas as pd
 import matplotlib.pyplot as plt
 import io
