@@ -1,6 +1,7 @@
 import streamlit as st
 from sentence_transformers import SentenceTransformer, util
 import json
+import requests
 import time
 import os
 from datetime import datetime
@@ -22,8 +23,14 @@ model = SentenceTransformer('snunlp/KR-SBERT-V40K-klueNLI-augSTS')
 FAQ_URL = "https://raw.githubusercontent.com/kyj01051/chat_1.0/main/faq.json"
 
 def load_faq_data():
-    with open(FAQ_URL, 'r', encoding='utf-8') as f:
-        return json.load(f)
+    # URL에서 파일을 다운로드
+    response = requests.get(FAQ_URL)
+    
+    # 다운로드가 성공하면 JSON 데이터를 반환
+    if response.status_code == 200:
+        return response.json()
+    else:
+        return None  # 다운로드 실패 시 None 반환
 
 faq_data = load_faq_data()
 
