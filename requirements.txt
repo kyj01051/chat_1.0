@@ -6,4 +6,5 @@ pandas
 matplotlib
 wordcloud
 plotly
+packaging==24.0
 requests
