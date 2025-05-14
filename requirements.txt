@@ -1,4 +1,8 @@
-sentence-transformers
-openai
 streamlit
-datetime
+sentence-transformers
+mysql-connector-python
+numpy
+pandas
+matplotlib
+wordcloud
+plotly
