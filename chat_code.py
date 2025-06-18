@@ -17,7 +17,7 @@ import plotly.graph_objects as go
 
 
 # 1. SBERT 모델 로딩
-model = SentenceTransformer('snunlp/KR-SBERT-V40K-klueNLI-augSTS')
+model = SentenceTransformer('snunlp/KR-SBERT-V40K-klueNLI-augSTS', device='cpu')
 
 # GitHub의 raw 파일 URL
 FAQ_URL = "https://raw.githubusercontent.com/kyj01051/chat_1.0/main/faq.json"
