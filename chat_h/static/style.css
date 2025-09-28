@@ -1,0 +1,480 @@
+/* style.css */
+body {
+    font-family: 'Noto Sans KR', sans-serif;
+    background-color: #e9f0f9;
+    color: #333;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+}
+
+header {
+    background-color: #fff;
+    padding: 20px;
+    text-align: center;
+    border-bottom: 2px solid #4a69bd;
+    position: relative;
+}
+
+header h1 {
+    margin: 0;
+    color: #4a69bd;
+    font-size: 24px;
+}
+
+.message p {
+  margin: 0;
+  line-height: 1.1; /* 여기서 줄 간격 조절 */
+}
+
+
+
+.admin-badge {
+    background-color: #e74c3c;
+    color: white;
+    padding: 2px 8px;
+    border-radius: 12px;
+    font-size: 12px;
+    margin-left: 10px;
+    position: absolute;
+    right: 20px;
+    top: 25px;
+    display: none;
+}
+
+/* 챗봇 메시지 컨테이너 스타일 */
+.messages-container {
+    flex: 1;
+    overflow-y: auto;
+    padding: 10px;
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+    min-height: 400px;
+    /* 💡 이 한 줄을 추가하여 메시지 풍선이 늘어나지 않도록 합니다. */
+    align-items: flex-start;
+}
+
+/* 💡 수정된 부분: 메시지 정렬을 위한 부모 요소 스타일 */
+.message-block {
+    display: flex;
+    width: 100%;
+    /* 💡 이 한 줄을 추가하여 메시지 블록이 늘어나지 않게 합니다. */
+    flex-grow: 0;
+}
+
+.message-block.user {
+    justify-content: flex-end; /* 사용자 메시지 오른쪽 정렬 */
+}
+
+.message-block.bot {
+    justify-content: flex-start; /* 챗봇 메시지 왼쪽 정렬 */
+}
+
+.message {
+    padding: 12px 18px;
+    border-radius: 20px;
+    max-width: 70%;
+    /* 💡 수정된 부분: 긴 단어 줄 바꿈 속성 추가 */
+    word-break: break-word;
+    overflow-wrap: break-word;
+    /* 💡 이 한 줄을 추가하여 메시지 블록이 늘어나지 않게 합니다. */
+    flex-grow: 0;
+}
+
+.message.user {
+    background-color: #e2ffcb !important;
+    color: #000;
+    border-bottom-right-radius: 5px;
+}
+
+.message.bot {
+    background-color: #e4e4e4 !important;
+    color: #000;
+    border-bottom-left-radius: 5px;
+}
+
+.input-area {
+    display: flex;
+    padding-top: 15px;
+    border-top: 1px solid #eee;
+}
+
+#messageInput {
+    flex: 1;
+    padding: 12px;
+    border: 1px solid #ccc;
+    border-radius: 20px;
+    outline: none;
+    font-size: 16px;
+}
+
+#sendBtn {
+    background-color: #4a69bd;
+    color: white;
+    border: none;
+    padding: 12px 20px;
+    border-radius: 20px;
+    margin-left: 10px;
+    cursor: pointer;
+    transition: background-color 0.3s;
+}
+
+#sendBtn:hover { background-color: #3b5cb0; }
+
+/* 챗봇과 관리자 페이지의 공통 컨테이너 */
+.container {
+    display: flex;
+    flex: 1;
+    max-width: 1200px;
+    margin: 20px auto;
+    background-color: #fff;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+    border-radius: 10px;
+    overflow: hidden;
+}
+
+/* --- 관리자 페이지 전용 너비 설정 --- */
+.admin-container {
+    max-width: 2000px; /* 원하는 너비로 수정 가능 */
+}
+
+/* 챗봇 페이지 레이아웃 */
+.chat-container {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    padding: 20px;
+}
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+.intro-text {
+  background-color: #f0f8ff;
+  padding: 20px;
+  border-radius: 8px;
+  line-height: 1;
+  margin-bottom: 20px;
+  text-align: left;
+}
+
+.intro-text p {
+  margin-top: 0 !important;
+  margin-bottom: 2px !important;
+}
+
+
+
+/* 챗봇 홈 화면 컨트롤 버튼 */
+.controls {
+    display: flex;
+    flex-direction: row;
+    gap: 10px;
+    margin-top: 15px;
+}
+
+.controls .control-btn {
+    flex: 1;
+    padding: 12px;
+    background-color: #f0f0f0;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    color: #333;
+    cursor: pointer;
+    text-align: center;
+    transition: background-color 0.3s;
+}
+
+.controls .control-btn:hover { background-color: #eef; }
+
+
+
+/* 관리자 로그인 폼 */
+.login-form {
+    border-top: 1px solid #ddd;
+    margin-top: 20px;
+    padding-top: 15px;
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+}
+
+.form-group { margin-bottom: 10px; }
+.form-group label {
+    display: block;
+    font-size: 14px;
+    color: #666;
+    margin-bottom: 5px;
+}
+.form-group input {
+    width: 100%;
+    padding: 8px;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+}
+
+.login-btn {
+    width: 100%;
+    padding: 10px;
+    background-color: #4a69bd;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+}
+.login-btn:hover { background-color: #3b5cb0; }
+
+/* 관리자 메뉴 */
+.admin-menu {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    margin-top: 15px;
+    border-top: 1px solid #ddd;
+    padding-top: 15px;
+}
+.admin-menu .menu-item {
+    padding: 12px;
+    background-color: #f0f0f0;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    color: #333;
+    text-decoration: none;
+    text-align: left;
+    transition: background-color 0.3s, transform 0.2s;
+    display: block;
+}
+.admin-menu .menu-item:hover { background-color: #eef; transform: translateY(-2px); }
+
+/* --- 관리자 페이지 전용 스타일 --- */
+.sidebar {
+    width: 250px;
+    background-color: #f4f7f9;
+    padding: 20px;
+    border-right: 1px solid #ddd;
+    display: flex;
+    flex-direction: column;
+}
+.sidebar h2 {
+    color: #4a69bd;
+    border-bottom: 1px solid #ddd;
+    padding-bottom: 10px;
+    margin-bottom: 20px;
+    font-size: 18px;
+}
+.sidebar-nav { display: flex; flex-direction: column; gap: 10px; }
+.sidebar-btn {
+    width: 100%;
+    padding: 12px;
+    background-color: #fff;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    color: #333;
+    cursor: pointer;
+    text-align: left;
+    transition: background-color 0.3s, transform 0.2s;
+    text-decoration: none;
+    display: block;
+}
+.sidebar-btn:hover { background-color: #eef; transform: translateY(-2px); }
+.sidebar-btn.active {
+    background-color: #4a69bd;
+    color: white;
+    border-color: #4a69bd;
+    transform: none;
+}
+.sidebar-btn i { margin-right: 10px; }
+.admin-main { flex: 1; padding: 20px; }
+.admin-main h2 {
+    color: #4a69bd;
+    border-bottom: 2px solid #4a69bd;
+    padding-bottom: 10px;
+    margin-bottom: 20px;
+}
+
+/* FAQ 관리 폼 */
+.faq-form {
+    background-color: #f9f9f9;
+    padding: 20px;
+    border-radius: 8px;
+    margin-top: 20px;
+}
+.faq-form .form-group { margin-bottom: 15px; }
+.faq-form label {
+    display: block;
+    font-weight: bold;
+    margin-bottom: 5px;
+}
+.faq-form input[type="text"], .faq-form textarea {
+    width: 100%;
+    padding: 10px;
+    font-size: 16px;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    box-sizing: border-box;
+    margin-top: 5px;
+}
+.faq-form textarea { resize: vertical; min-height: 150px; }
+.faq-form .btn-group {
+    display: flex;
+    justify-content: flex-end;
+    gap: 10px;
+}
+.faq-form button {
+    padding: 20px 30px;
+    border: none;
+    border-radius: 5px;
+    color: white;
+    cursor: pointer;
+}
+.faq-form .btn-primary { background-color: #4a69bd; }
+.faq-form .btn-secondary { background-color: #6c757d; }
+
+/* 데이터 테이블 */
+.data-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 20px;
+}
+.data-table th, .data-table td {
+    border: 1px solid #ddd;
+    padding: 12px;
+    text-align: left;
+}
+.data-table th {
+    background-color: #f4f7f9;
+    font-weight: bold;
+    color: #333;
+}
+.data-table tr:nth-child(even) { background-color: #f9f9f9; }
+.data-table tr:hover { background-color: #eef; }
+
+/* 액션 버튼 */
+.action-buttons {
+    display: flex;
+    gap: 5px;
+}
+.action-buttons button {
+    padding: 5px 10px;
+    border: none;
+    border-radius: 3px;
+    color: white;
+    cursor: pointer;
+}
+.action-buttons .edit-btn { background-color: #28a745; }
+.action-buttons .delete-btn { background-color: #dc3545; }
+
+footer {
+    background-color: #4a69bd;
+    color: white;
+    text-align: center;
+    padding: 15px;
+    font-size: 14px;
+}
+/* 관련 질문 버튼 컨테이너 */
+.related-questions-container {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-top: 10px;
+    margin-bottom: 20px;
+    align-self: flex-start;
+}
+
+/* 관련 질문 버튼 개별 스타일 */
+.related-question-btn {
+    background-color: #e0e0e0;
+    color: #555;
+    border: none;
+    border-radius: 20px;
+    padding: 8px 15px;
+    font-size: 14px;
+    cursor: pointer;
+    transition: background-color 0.2s;
+}
+
+.related-question-btn:hover {
+    background-color: #d0d0d0;
+}
+
+/* 챗봇 컨테이너의 최대 너비 설정 */
+.chat-container {
+    max-width: 800px;
+    margin: 0 auto;
+}
+
+/* 로그 테이블 전체 스타일 */
+.log-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 15px;
+    font-size: 14px;
+}
+
+.log-table th, .log-table td {
+    border: 1px solid #ddd;
+    padding: 10px;
+}
+
+/* 💡 수정된 부분: th에 flexbox를 제거하고 text-align만 적용 */
+.log-table th {
+    background-color: #f2f2f2;
+    cursor: pointer;
+    user-select: none;
+    text-align: center;
+    padding: 10px; /* 원래 패딩 값을 th에 다시 적용 */
+}
+
+/* 💡 수정된 부분: th 내부에 있는 th-content에만 flexbox를 적용하여 ID와 아이콘을 정렬 */
+.log-table th .th-content {
+    display: flex;
+    align-items: center; 
+    justify-content: center;
+}
+
+/* 모든 내용(td)은 왼쪽 정렬 */
+.log-table td {
+    text-align: left;
+}
+
+/* ID 열의 내용(td)만 중앙 정렬 */
+.log-table td:nth-child(1) {
+    text-align: center;
+}
+
+/* 호버 효과 */
+.log-table th:hover {
+    background-color: #e9e9e9;
+}
+
+/* 정렬 아이콘 위치 */
+.log-table th .sort-icon {
+    margin-left: 5px;
+}
+
+/* 화면 너비가 800px 미만일 때 적용 (모바일, 태블릿) */
+@media (max-width: 800px) {
+    .chat-container {
+        width: 90%;
+        max-width: none;
+    }
+}
+
+/* FAQ 폼의 텍스트 영역 */
+.admin-main .form-group textarea {
+    min-height: 150px;
+}
+
+/* 화면 너비가 600px 미만일 때 적용 (모바일) */
+@media (max-width: 600px) {
+    .admin-main .form-group textarea {
+        min-height: 100px;
+    }
+}
+

@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>관리자 - 대구대 문헌정보학과 챗봇</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet" />
+    <link rel="stylesheet" href="/static/style.css"> <style>
+        /* index.html의 style 태그 안에 있던 관리자 관련 CSS를 여기에 복사 */
+        /* 아니면 style.css 파일을 만들어 연동하거나, index.html에 통합해도 됩니다. */
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div id="adminContent">
+            <div class="tabs">
+                <div class="tab active" data-tab="dashboard">대시보드</div>
+                <div class="tab" data-tab="faq">FAQ 관리</div>
+                <div class="tab" data-tab="logs">로그 관리</div>
+                <div class="tab" data-tab="analytics">챗봇 분석</div>
+            </div>
+
+            <div class="admin-content active" id="dashboardTab">
+                <h2>👨‍💼 관리자 대시보드</h2>
+                </div>
+
+            <div class="admin-content" id="faqTab">
+                <h2>📝 FAQ 관리</h2>
+                </div>
+
+            <div class="admin-content" id="logsTab">
+                <h2>📊 로그 관리</h2>
+                </div>
+
+            <div class="admin-content" id="analyticsTab">
+                <h2>📈 챗봇 성능 분석</h2>
+                </div>
+        </div>
+    </div>
+    <script src="/static/script.js"></script> </body>
+</html>

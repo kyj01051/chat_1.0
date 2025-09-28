@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>대구대학교 문헌정보학과 챗봇</title>
+    <link rel="stylesheet" href="/static/style.css" />
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet" />
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;700&display=swap" rel="stylesheet" />
+</head>
+<body>
+    <header>
+        <h1>대구대학교 문헌정보학과 챗봇</h1>
+        <span class="admin-badge" id="adminBadge" style="display: none;">관리자</span>
+    </header>
+
+    <div class="container">
+        <div class="chat-container">
+            <div class="intro-text">
+                <p>대구대학교 문헌정보학과에서 운영하는 챗봇입니다.</p>
+                <p>입학 및 학과에 관해 궁금한 점이 있다면 챗봇에게 질문해주시길 바랍니다.</p>
+                <p>챗봇이 답변하지 못하는 질문들은 학과사무실 또는 학과 홈페이지를 참고 부탁드립니다.</p>
+                <p>📞 <strong>대구대학교 문헌정보학과 학과 사무실 전화번호</strong>: 053-850-6350</p>
+                <p>🌐 <strong>학과 홈페이지</strong>: <a href="https://lis.daegu.ac.kr/main" target="_blank">https://lis.daegu.ac.kr/main</a>
+                </p>
+            </div>
+
+            <div class="messages-container" id="messagesContainer"></div>
+
+            <div class="related-questions-container" id="relatedQuestionsContainer"></div>
+
+            <div class="input-area">
+                <input type="text" id="messageInput" placeholder="질문을 입력해주세요..." />
+                <button id="sendBtn"><i class="fas fa-paper-plane"></i></button>
+            </div>
+
+            <div class="controls">
+                <button id="clearChatBtn" class="control-btn"><i class="fas fa-redo"></i> 대화 초기화</button>
+                <button id="loginBtn" class="control-btn"><i class="fas fa-user-lock"></i> 관리자 로그인</button>
+                <button id="logoutBtn" class="control-btn" style="display: none;"><i class="fas fa-sign-out-alt"></i> 로그아웃</button>
+            </div>
+
+            <div id="adminMenu" class="admin-menu" style="display: none;">
+                <a href="/admin" class="menu-item"><i class="fas fa-chart-line"></i> 로그기록</a>
+                <a href="/faq_list" class="menu-item"><i class="fas fa-question-circle"></i> FAQ 관리</a>
+            </div>
+
+            <div class="login-form" id="loginForm" style="display: none;">
+                <div class="form-group">
+                    <label for="username">아이디</label>
+                    <input type="text" id="username" placeholder="아이디를 입력하세요">
+                </div>
+                <div class="form-group">
+                    <label for="password">비밀번호</label>
+                    <input type="password" id="password" placeholder="비밀번호를 입력하세요">
+                </div>
+                <button class="login-btn" id="submitLoginBtn">로그인</button>
+            </div>
+        </div>
+    </div>
+    
+    <footer>
+        © 2025 대구대학교 문헌정보학과. All rights reserved.
+    </footer>
+    <script src="/static/script.js"></script>
+</body>
+</html>
